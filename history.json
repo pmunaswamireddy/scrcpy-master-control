@@ -1,0 +1,13 @@
+{
+    "wireless_ips": [
+        "oneplus-nord-ce-3-lite-5g.tailb20e49.ts.net",
+        "v2037.tailb20e49.ts.net"
+    ],
+    "known_devices": {
+        "331db584": "CPH2467 (USB) [331db584]",
+        "oneplus-nord-ce-3-lite-5g.tailb20e49.ts.net:5555": "CPH2467 (Wifi) [oneplus-nord-ce-3-lite-5g.tailb20e49.ts.net:5555]",
+        "v2037.tailb20e49.ts.net:5555": "V2037 (Wifi) [v2037.tailb20e49.ts.net:5555]",
+        "adb-9637748864002HW-MyyyYW._adb-tls-connect._tcp": "V2037 (USB) [adb-9637748864002HW-MyyyYW._adb-tls-connect._tcp]",
+        "10.117.99.27:44499": "V2037 (Wifi) [10.117.99.27:44499]"
+    }
+}

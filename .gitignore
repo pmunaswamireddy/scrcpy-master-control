@@ -1,0 +1,21 @@
+# Build artifacts
+build/
+dist/
+tools/
+Output/
+__pycache__/
+*.spec
+
+# Compiled executables (distribute via Releases, not git)
+*.exe
+
+# Python
+*.pyc
+*.pyo
+.env
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
