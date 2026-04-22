@@ -143,10 +143,12 @@ def get_mdns_port(ip, log_callback=None):
         for line in res.stdout.splitlines():
             if ip in line and "_adb._tcp" in line:
                 parts = line.split()
-                if parts and ":" in parts[-1]:
-                    port = parts[-1].split(":")[-1]
-                    if log_callback: log_callback(f"Found port {port} via adb mdns.")
-                    return port
+                for part in parts:
+                    if ":" in part and ip in part:
+                        port = part.split(":")[-1]
+                        if port.isdigit():
+                            if log_callback: log_callback(f"Found port {port} via adb mdns.")
+                            return port
     except Exception:
         pass
     return None
@@ -163,6 +165,8 @@ def connect(ip, log_callback, force_kill=False, manual_port=None):
         target_host = ip.split(":")[0]
         if not target_port:
             target_port = ip.split(":")[1]
+
+    ip = target_host
 
     log_callback(f"Connecting to {target_host}...")
 
@@ -317,6 +321,8 @@ class AdbApp(ctk.CTk):
         self.resizable(True, True)
         self.minsize(600, 750)
         
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
         # Core State
         self.config = load_settings()
         hist_data = load_history()
@@ -528,11 +534,15 @@ class AdbApp(ctk.CTk):
             parts = cmd.split()
             target = " ".join(parts[1:]).replace('"', '')
             if target.lower().startswith("cd "): target = target[3:].strip()
-            if os.path.isdir(target):
-                self.terminal_cwd = os.path.abspath(target)
-                self.log(f"\n📂 Path changed to: {self.terminal_cwd}")
-            elif not target:
+
+            if not target:
                 self.log(f"\n📂 Current: {self.terminal_cwd}")
+                return
+
+            new_path = os.path.abspath(os.path.join(self.terminal_cwd, target))
+            if os.path.isdir(new_path):
+                self.terminal_cwd = new_path
+                self.log(f"\n📂 Path changed to: {self.terminal_cwd}")
             else:
                 self.log(f"\n❌ Directory not found: {target}")
             return
@@ -1129,7 +1139,15 @@ class AdbApp(ctk.CTk):
 
         # Input Spoofing
         k_mode = self.o_k_mode.get().split()[0]
-        if k_mode != "sdk": args.append(f"--keyboard={k_mode}")        # Window & Device
+        if k_mode != "sdk": args.append(f"--keyboard={k_mode}")
+
+        m_mode = self.o_m_mode.get().split()[0]
+        if m_mode != "sdk": args.append(f"--mouse={m_mode}")
+
+        if self.c_no_clip.get(): args.append("--no-clipboard-autosync")
+        if self.c_legacy.get(): args.append("--legacy-paste")
+
+        # Window & Device
         if self.c_screenoff.get(): args.append("-S")
         if self.c_awake.get(): args.append("-w")
         if self.c_full.get(): args.append("-f")
