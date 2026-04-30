@@ -610,17 +610,19 @@ class AdbApp(ctk.CTk):
 
     def _process_log_queue(self):
         try:
-            while not self.log_queue.empty():
-                message = self.log_queue.get_nowait()
+            if not self.log_queue.empty():
                 self.console_log.configure(state="normal")
+                while not self.log_queue.empty():
+                    message = self.log_queue.get_nowait()
+
+                    # Truncate history
+                    line_count = int(self.console_log.index('end-1c').split('.')[0])
+                    if line_count > 2000:
+                        self.console_log.delete("1.0", "501.0")
+                        self.console_log.insert("1.0", "--- Truncated to maintain performance ---\n")
+
+                    self.console_log.insert("end", f"{message}\n")
                 
-                # Truncate history
-                line_count = int(self.console_log.index('end-1c').split('.')[0])
-                if line_count > 2000:
-                    self.console_log.delete("1.0", "501.0")
-                    self.console_log.insert("1.0", "--- Truncated to maintain performance ---\n")
-                
-                self.console_log.insert("end", f"{message}\n")
                 self.console_log.see("end")
                 self.console_log.configure(state="disabled")
         except:
